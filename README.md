@@ -58,7 +58,7 @@ WanGP is a one-stop super app for open source generative models: create videos, 
 - **Offline workflows**: keep generation and Deepy local; use `--offline` to require already-downloaded files and prevent automatic downloads.
 - **Temporal and spatial upsampling**: improve outputs with DLLS5, RIFE, FlashVSR, SeedVR and Lanczos.
 - **Audio postprocessing**: generate soundtracks with MMAudio, replace voices with SeedVC, or remux a video with any soundtrack.
-- **Ready-to-use plug-ins**: Gallery Browser, Motion Designer, Models/Checkpoints Manager, CivitAI browser and downloader, and more.
+- **Ready-to-use Plugins**: Gallery Browser, Motion Designer, Models/Checkpoints Manager, CivitAI browser and downloader, and more.
 
 **Discord Server to get Help from the WanGP Community and show your Best Gens:** https://discord.gg/g7efUW9jGV
 
@@ -82,6 +82,32 @@ WanGP is a one-stop super app for open source generative models: create videos, 
 
 
 ## 🔥 Latest Updates : 
+
+## 31st of October 2026: WanGP v19.0 - More Treats Than You Can Handle
+
+- **Showrunner**: from a brief to a finished production of up to ten minutes: a music video, a short film, an ad, a trailer or an illustrated story. Deepy Prime becomes your showrunner: it plans every shot, casts, shoots, checks its own takes, redoes the failed ones and assembles the cut ([Showrunner guide](docs/SHOWRUNNER.md)).
+  - **The same cast from start to finish**: faces, outfits and voices stay consistent across dozens of shots, costume changes included, and long productions get titles and chapter cards.
+  - **Music videos cut on the song**: shots follow its parts and bars, with lip-synced singers. No song yet? The showrunner composes one.
+  - **You stay the director**: review the plan before any video is generated, approve takes or ask for reshoots, add new pictures or voices, and ask for changes in plain words at any time. Every change, yours or the showrunner's, can be undone.
+  - **Instant editing**: the Timeline plays the cut at once, without rendering, and titles are drawn over the picture, so they are always sharp and spelled right.
+  - **Every version kept**: compare versions side by side, go back to one or branch it into a new production. Exports come with subtitles and a levelled soundtrack.
+  - **Works with your models**: Showrunner uses Deepy's templates, your own included, and can pause to free the GPU for other work. It needs Deepy Prime, with a local model or a remote agent.
+
+- **Nemotron Transcription**: turn speech into text offline, with little VRAM: who said what (up to eight speakers, even talking over each other), when each word was said, subtitles, and translation to or from English, for recordings of up to an hour in 40 languages. **Q4 Experts** (32 GB of RAM) is the recommended version.
+  - **Audio or video**: transcribe an audio file or a video's soundtrack.
+  - **Jump in the recording**: the transcript shows under the Audio gallery player, as text or as a timeline per speaker; click a line or a turn to play from there.
+  - **Subtitled videos**: get the video back with the transcript or translation as subtitles, shown or hidden with the new **CC** button of the Video gallery.
+  - **Your names and words**: name the speakers, give the spelling of names and jargon, keep every hesitation or get clean text, with timings per turn or per word; translations can be timed and subtitled too.
+  - **Deepy Prime**: ask for speaker-labelled transcripts, translations or subtitled videos once a Nemotron model is chosen in **Configuration > Prompt Enhancer / Deepy > Transcription**.
+
+- **WanGP Manager (Experimental, Windows)**: [download the official app](https://github.com/deepbeepmeep/WanGP/releases/latest/download/WanGPManager.exe) for guided setup that selects the recommended GPU profile and installs Python and dependencies for you.\
+  Keep several installations, update their dependencies and recommended kernels, try an older WanGP build or restore both source and environment from a saved version.\
+  Launch WanGP in its own window or your browser; add existing Conda installations and update them through a separate environment copy, keeping the original available for rollback.
+
+- **Refreshed UI**:
+  - **App bar**: apps sit side by side with an icon and a name, and the icons on the right open **Configuration**, **Apps & PlugIn Manager** and **Infos** (guides and About together).
+  - **Full-screen apps**: Media Flow and Showrunner open full screen, also straight from `/media-flow/` and `/showrunner/`; **WanGP** brings you back where you were.
+  - **Media Flow**: redesigned as an app, with help on its controls and its [guide](docs/MEDIA_FLOW.md) built in.
 
 ## 29th of October 2026: WanGP v18.888 - Are You Game?
 
@@ -408,6 +434,15 @@ See full changelog: **[Changelog](docs/CHANGELOG.md)**
 
 ## 🚀 Quick Start
 
+Choose one of these four guided installation methods:
+
+1. **[Bat/SH scripts](#one-click-batsh-script-auto-installer)** — install and maintain WanGP from the included scripts.
+2. **[Pinokio](#one-click-installers)** — use the community installer in Pinokio.
+3. **[Wan2GP Desktop](#one-click-installers)** — use GKArtist's desktop launcher.
+4. **[WanGP Manager](#wangp-manager-experimental-windows)** — the experimental official Windows app for guided installation, launching, updates and rollback.
+
+Manual installation instructions follow these options below.
+
 ### One-click Bat/SH Script Auto-installer:
 
 The 1-click automated scripts for both **Windows (`.bat`)** and **Linux/macOS (`.sh`)** make installation, environment management, and updates as seamless as possible. These scripts will not only install WanGP but also best acceleration kernels (Triton, Sage, Flash, GGuf, Lightx2v, Nunchaku) available for your config.
@@ -465,6 +500,14 @@ It is recommended to use in Pinokio the Community Scripts *wan2gp* or *wan2gp-am
 
 - Wan2GP Desktop by GKArtist
 [Wan2GP Desktop](https://github.com/GKartist75/Wan2GP-Desktop-Tauri) is a desktop launcher for Wan2GP that installs, updates, and runs it from one window — handling Git, Python, CUDA, and PyTorch setup so you don't have to configure them manually.
+
+### WanGP Manager (Experimental, Windows)
+
+**The fourth installation method is an experimental Windows x64 app.** WanGP Manager guides you through choosing an installation folder, a WanGP version and the recommended profile for your detected GPU. It installs Python and dependencies for you, then lets you launch WanGP in its own app window or your browser. You can also update a managed installation, try an older build or roll back to a saved version.
+
+**Download:** [WanGPManager.exe](https://github.com/deepbeepmeep/WanGP/releases/latest/download/WanGPManager.exe). This permanent link downloads the latest Manager release.
+
+Run `WanGPManager.exe`, open Manager and follow the **Install** tab. The official [WanGP repository](https://github.com/deepbeepmeep/WanGP) is selected by default. Model downloads, generation and Deepy remain in WanGP's web interface. To reuse existing checkpoints, add all of your checkpoint folders in WanGP's configuration.
 
 ### Manual installation: (for RTX20xx - RTX50xx)
 
@@ -528,8 +571,9 @@ scripts\gputrim.cmd
 Trimming briefly applies memory pressure to encourage Windows to move idle GPU allocations to system RAM, then releases its allocations and displays updated usage. It can briefly stall GPU applications, and savings are not guaranteed. By default, it refuses if a process other than the Windows desktop compositor uses more than 1 GB; close GPU-heavy applications before retrying.
 
 #### Update the application (stay in the current python / pytorch version):
-If using Pinokio use Pinokio to update otherwise:
-Get in the directory where WanGP is installed and:
+For a Manager-managed installation, use the **Maintenance** tab in WanGP Manager. For another guided installer, use its update action or the included update script.
+
+For a manual installation, get in the directory where WanGP is installed and:
 ```bash
 git pull
 conda activate wan2gp
@@ -602,6 +646,8 @@ This automated script will:
 **Supported GPUs:** RTX 40XX, RTX 30XX, RTX 20XX, GTX 16XX, GTX 10XX, Tesla V100, A100, H100, and more.
 
 ## 📦 Installation
+
+See the [four guided installation methods](#-quick-start), including **[WanGP Manager (Experimental, Windows)](#wangp-manager-experimental-windows)** and its permanent download link. The guides below cover manual installation and optional components.
 
 ### Nvidia
 For detailed installation instructions for different GPU generations:

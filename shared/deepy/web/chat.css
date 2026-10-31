@@ -1838,6 +1838,10 @@
     background: linear-gradient(145deg, rgba(239, 249, 254, 0.98), rgba(219, 239, 249, 0.96));
 }
 
+.chat__attachment-thumb[hidden] {
+    display: none;
+}
+
 .chat__attachment-thumb--icon svg {
     width: 46px;
     height: 46px;

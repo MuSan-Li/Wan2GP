@@ -58,9 +58,14 @@ DEEPY_TEMPLATE_CONFIG_MIGRATIONS = {
     },
     DEEPY_TOOL_GEN_VIDEO_KEY: {
         "MiniMax H3 FL2VA Turbo Lightx2v 8 Steps": "MiniMax H3 FL2VA Pruned Turbo Lightx2v 8 Steps",
+        "Pika H3 Flex FL2VA 6 Steps": "Pika H3 Flex FL2VA Pruned 6 Steps",  # Pika templates moved to the pruned models (2026-10-31)
     },
     DEEPY_TOOL_GEN_VIDEO_WITH_SPEECH_KEY: {
         "MiniMax H3 FL2VA Turbo Lightx2v 8 Steps With Sound": "MiniMax H3 FL2VA Pruned Turbo Lightx2v 8 Steps With Sound",
+        "Pika H3 Flex Ref2VA 6 Steps With Audio References": "Pika H3 Flex Ref2VA Pruned 6 Steps With Audio References",
+    },
+    DEEPY_TOOL_GEN_VIDEO_WITH_REFS_KEY: {
+        "Pika H3 Flex Ref2VA 6 Steps": "Pika H3 Flex Ref2VA Pruned 6 Steps",
     },
     DEEPY_TOOL_GEN_3D_KEY: {
         "TRELLIS.2 4B": "TRELLIS.2 + SUPRA-Tex PBR 4B + 2.1B",  # TRELLIS.2 split into a Shape model and a Texturer (2026-10-29)
@@ -114,6 +119,14 @@ PYTHON_APPS_KEY = "python_apps"  # shared config group of App Development (Advan
 PYTHON_APPS_LEVELS = ("off", "apps", "plugins")
 DEEPY_WEB_SEARCH_KEY = "deepy_web_search"
 DEEPY_WEB_SEARCH_DEFAULT = "disabled"
+DEEPY_ADVANCED_TRANSCRIPTION_KEY = "deepy_advanced_transcription"  # the transcription model of Prime's advanced_transcription toolbox action, or disabled
+DEEPY_ADVANCED_TRANSCRIPTION_DEFAULT = "disabled"
+DEEPY_ADVANCED_TRANSCRIPTION_CHOICES = [
+    ("Use Whisper Only", "disabled"),
+    ("Nemotron INT8 Experts", "nemotron_transcribe"),
+    ("Nemotron Q4 Experts (Recommended)", "nemotron_transcribe_q4"),
+]
+DEEPY_TRANSCRIPTION_TERMS_KEY = "deepy_transcription_terms"  # names and jargon added to every advanced transcription (Nemotron context terms)
 CIVITAI_API_KEY_KEY = "civitai_api_key"  # shared config: Civitai downloads of LoRAs through Deepy's web toolbox (searching needs none); plaintext only when not stored securely
 CIVITAI_API_KEY_SECURE_KEY = "civitai_api_key_secure"  # the key lives in the OS credential manager under the credential id below
 CIVITAI_API_KEY_CREDENTIAL_ID_KEY = "civitai_api_key_credential_id"
@@ -234,7 +247,7 @@ def normalize_deepy_tool_gen_video_with_speech(value: Any) -> str:
 
 
 def normalize_deepy_tool_gen_video_with_refs(value: Any) -> str:
-    return _normalize_deepy_variant(value, {}, DEEPY_DEFAULT_GEN_VIDEO_WITH_REFS)
+    return _normalize_deepy_variant(value, DEEPY_TEMPLATE_CONFIG_MIGRATIONS[DEEPY_TOOL_GEN_VIDEO_WITH_REFS_KEY], DEEPY_DEFAULT_GEN_VIDEO_WITH_REFS)
 
 
 def normalize_deepy_tool_gen_song(value: Any) -> str:
@@ -519,6 +532,22 @@ def normalize_deepy_web_search(value: Any) -> str:
     if isinstance(value, bool):
         return "enabled" if value else "disabled"
     return "enabled" if str(value or "").strip().lower() in {"enabled", "on", "true", "1", "yes"} else "disabled"
+
+
+def normalize_deepy_advanced_transcription(value: Any) -> str:
+    value = str(value or "").strip()
+    return value if value in {choice for _label, choice in DEEPY_ADVANCED_TRANSCRIPTION_CHOICES} else DEEPY_ADVANCED_TRANSCRIPTION_DEFAULT
+
+
+def advanced_transcription_model() -> str:
+    """The model type of Prime's advanced transcription, or "" while the user has not enabled it."""
+    model_type = normalize_deepy_advanced_transcription(get_deepy_config_value(DEEPY_ADVANCED_TRANSCRIPTION_KEY, DEEPY_ADVANCED_TRANSCRIPTION_DEFAULT))
+    return "" if model_type == DEEPY_ADVANCED_TRANSCRIPTION_DEFAULT else model_type
+
+
+def advanced_transcription_terms() -> str:
+    """The user's names and jargon for every advanced transcription, comma- or line-separated."""
+    return str(get_deepy_config_value(DEEPY_TRANSCRIPTION_TERMS_KEY, "") or "").strip()
 
 
 def normalize_deepy_mcp_auto_discover_paths(value: Any) -> bool:

@@ -11,6 +11,7 @@ import queue
 import re
 import shutil
 import threading
+import time
 import traceback
 import uuid
 from dataclasses import dataclass
@@ -524,6 +525,22 @@ class DeepyClient:
         paths = self._service.plugin_resolve_media(list(media))
         return DeepyJob(self._service, self.owner, prompt, paths, media_mode=media_mode, session_dir=session_dir, workspace=workspace, title=title,
                         instructions=str(instructions or "").strip())
+
+    def release_vram(self, timeout: float = 120.0) -> bool:
+        """Take Deepy's model out of VRAM (its conversation stays, and comes back at its next request) once Deepy is idle: no job, request
+        or generation running. Waits up to timeout seconds for that; returns whether it released."""
+        service = self._service
+        deadline = time.monotonic() + timeout
+        with service._condition:
+            while not (service._plugin_job is None and service._plugin_idle()):
+                if time.monotonic() > deadline:
+                    return False
+                service._condition.wait(timeout=1)
+        with service._mutation_lock:
+            if service._plugin_job is not None or not service._plugin_idle():
+                return False
+            service._deps.controller.release_vram(service._state)
+        return True
 
     def ensure_workspace(self, name: str, folder: str | os.PathLike) -> str:
         """The id of the workspace keeping its media in folder, created (with this name) the first time."""

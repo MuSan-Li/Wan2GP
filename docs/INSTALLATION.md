@@ -1,6 +1,14 @@
 # Manual Installation Guide For Windows & Linux
 
-This guide covers manual installation for different GPU generations and operating systems. Alternatively you may use the 1 click install / update scripts (please check the repo readme for instructions).
+This guide covers manual installation for different GPU generations and operating systems. The [README's four guided installation methods](../README.md#-quick-start) also cover the Bat/SH scripts, Pinokio, Wan2GP Desktop and **WanGP Manager (Experimental, Windows x64)**.
+
+WanGP Manager guides installation, installs Python and dependencies, launches WanGP in an app window or browser, and manages updates and rollback. **Download:** [WanGPManager.exe](https://github.com/deepbeepmeep/WanGP/releases/latest/download/WanGPManager.exe). This permanent link downloads the latest Manager release. See the [Manager instructions](../README.md#wangp-manager-experimental-windows).
+
+For an existing Conda installation, choose **Install → Add existing installation**, select the WanGP folder and pick its **Conda environment** from the automatically discovered list. Each entry includes its path; use **Refresh** after creating an environment, or browse to its Python executable if it is not listed. Discovery and registration leave packages unchanged.
+
+Open **Maintenance** to update that installation, install the selected version's dependencies and recommended kernels, or try an older WanGP version. Manager copies the current Conda environment, updates and checks the copy, then switches the source and selected environment together. **Saved versions → Preview restore** returns both to a previous working pair, including the environment used before the first update. Your settings, checkpoints and outputs stay in place.
+
+Conda updates require Git, Conda and a WanGP Git checkout with no pending tracked source edits. Stop WanGP and save or stash those edits first. Allow disk space for another environment; retained environments are kept for rollback. Launch through Manager or WanGP's installation scripts to use the selected copy: activating the original Conda environment by its old name still selects the unchanged original. Manager keeps the chosen source revision separate from your Git branches. Existing environments that are not Conda remain available for launching and inspection.
 
 It is recommended to use Python 3.10.9, PyTorch 2.7.1 with Cuda 12.8 for GTX 10XX and Python 3.11.14, PyTorch 2.10 with Cuda 13.0/13.1 for RTX 20XX - RTX 50XX. RTX 20XX requires Triton 3.2.
 

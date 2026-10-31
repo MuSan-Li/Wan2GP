@@ -16,7 +16,16 @@ class AboutPlugin(WAN2GPPlugin):
         )
 
     def create_about_ui(self):
-        gr.Markdown("<H2>WanGP - AI Generative Models for the GPU Poor by <B>DeepBeepMeep</B> (<A HREF='https://github.com/deepbeepmeep/Wan2GP'>GitHub</A>)</H2>")
+        gr.Markdown("<H2>WanGP - AI Generative Models for the GPU Poor by <B>DeepBeepMeep</B> (<A HREF='https://github.com/deepbeepmeep/WanGP'>GitHub</A>)</H2>")
+        gr.Markdown("""### Installation
+
+1. **Bat/SH scripts** — use WanGP's included install, run and update scripts.
+2. **[Pinokio](https://pinokio.computer/)** — use the community *wan2gp* or *wan2gp-amd* scripts by Morpheus.
+3. **[Wan2GP Desktop](https://github.com/GKartist75/Wan2GP-Desktop-Tauri)** — GKArtist's desktop installer and launcher.
+4. **WanGP Manager (Experimental, Windows x64)** — the official app for guided installation, launching, updates and rollback. **Download:** [WanGPManager.exe](https://github.com/deepbeepmeep/WanGP/releases/latest/download/WanGPManager.exe). This permanent link downloads the latest Manager release.
+
+See the [installation instructions](https://github.com/deepbeepmeep/WanGP#-quick-start) for these four methods and manual setup.
+""")
         gr.Markdown("Many thanks to:")
         gr.Markdown("- <B>Bria AI</B> for Fibo 2.0 Dev\\* image generation and editing, and Fibo 2.0 Edit Turbo\\* four-step editing (https://huggingface.co/briaai/Fibo-2.0-dev, https://huggingface.co/briaai/Fibo-2.0-edit-turbo)")
         gr.Markdown("- <B>Alibaba Wan Team</B> for the best open source video generators (https://github.com/Wan-Video/Wan2.1, https://github.com/Wan-Video/Wan2.2)")

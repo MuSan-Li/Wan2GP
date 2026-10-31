@@ -1051,7 +1051,7 @@ def build_tool_call_label(
         return _finish_tool_call_label(f"Create{details} {color or 'Color'} Frame")
     if normalized_name == "inspect_video":
         source = _short_tool_label_value(arguments.get("media_id"))
-        start_time, end_time = arguments.get("start_time_seconds"), arguments.get("end_time_seconds")
+        start_time, end_time = arguments.get("start_s", arguments.get("start_time_seconds")), arguments.get("end_s", arguments.get("end_time_seconds"))  # labels see the raw call: former names too
         try:
             range_label = f" from {float(start_time):g}s to {float(end_time):g}s"
         except (TypeError, ValueError):
@@ -1074,7 +1074,7 @@ def build_tool_call_label(
             extension = os.path.splitext(source_basename)[1].casefold()
             if extension in _IMAGE_EXTENSIONS:
                 images += 1
-            elif extension in _VIDEO_EXTENSIONS or isinstance(item, dict) and any(item.get(key) is not None for key in ("frame_no", "time_seconds")):
+            elif extension in _VIDEO_EXTENSIONS or isinstance(item, dict) and any(item.get(key) is not None for key in ("frame_no", "time_s", "time_seconds")):
                 frames += 1
                 if extension in _VIDEO_EXTENSIONS:
                     video_names.append(source_name)
@@ -1765,7 +1765,7 @@ def _bundled_thumbnail_url(thumbnail_path: str) -> str:
     return register_file_download(path)["url"]
 
 
-def _attachment_icon(kind: str) -> str:
+def _attachment_icon(kind: str, hidden: bool = False) -> str:
     icons = {
         "archive": "<rect x='4' y='6' width='40' height='10' rx='2'></rect><path d='M8 16v22a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4V16'></path><path d='M19 25h10'></path>",
         "audio": "<path d='M18 36V13l19-4v23'></path><path d='M18 19l19-4'></path><ellipse cx='13' cy='37' rx='5' ry='4'></ellipse><ellipse cx='32' cy='33' rx='5' ry='4'></ellipse>",
@@ -1779,7 +1779,7 @@ def _attachment_icon(kind: str) -> str:
         "file": "<path d='M13 5h15l7 7v31H13z'></path><path d='M28 5v8h7M19 23h10M19 29h10M19 35h7'></path>",
     }
     icon_kind = kind if kind in icons else "file"
-    return f"<div class='chat__attachment-thumb chat__attachment-thumb--icon chat__attachment-thumb--{icon_kind}' data-attachment-icon='{icon_kind}'><svg viewBox='0 0 48 48' aria-hidden='true' focusable='false'>{icons[icon_kind]}</svg></div>"
+    return f"<div class='chat__attachment-thumb chat__attachment-thumb--icon chat__attachment-thumb--{icon_kind}' data-attachment-icon='{icon_kind}'{' hidden' if hidden else ''}><svg viewBox='0 0 48 48' aria-hidden='true' focusable='false'>{icons[icon_kind]}</svg></div>"
 
 
 def _render_copy_button(source: str, label: str, text: str | None = None) -> str:
@@ -2152,8 +2152,8 @@ def _render_attachments(attachments: list[dict[str, Any]]) -> str:
         format_attribute = f" data-media-format='{html.escape(media_format[1:])}'" if kind == '3d' else ''
         thumb_url = str(attachment.get("thumb_url", "")).strip()
         subtitle_html = f"<span class='chat__attachment-subtitle'>{subtitle}</span>" if len(subtitle) > 0 else ""
-        thumb_html = (
-            f"<img class='chat__attachment-thumb' loading='lazy' src='{html.escape(thumb_url)}' alt='{label}'>"
+        thumb_html = (  # the typed icon waits beside a preview, which chat.js swaps for it when the preview cannot be made (an unreadable video)
+            f"<img class='chat__attachment-thumb' loading='lazy' src='{html.escape(thumb_url)}' alt='{label}'>{_attachment_icon(kind.strip().lower(), hidden=True)}"
             if len(thumb_url) > 0
             else _attachment_icon(kind.strip().lower())
         )

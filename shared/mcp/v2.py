@@ -65,6 +65,7 @@ MEDIA_DISCOVERY_DESCRIPTIONS = {
     "draw_svg": "Draw a Gallery image or animated clip from SVG markup (shapes, text, gradients, filters; Gallery images or authorized files embedded), or exact on-screen text and graphics burned over a video (video_id; never subtitles).",
     "remux_media": "Copy video, combine audio, and add selectable subtitle tracks.",
     "transcribe_media": "Transcribe speech with timestamps: media_id (timestamp_type word for word timings); subtitles_path writes an SRT timed to that media.",
+    "advanced_transcription": "Who said what: speaker-labelled (or named) transcript or translation of media_id, timed per turn or per word, SRT, optionally the video with subtitles, context_terms (Nemotron, a WanGP job of minutes).",
 }
 
 

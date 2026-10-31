@@ -241,13 +241,13 @@ spatial_upsampler_handlers = [
 it should not import or keep one explicit variable per spatial upsampler.
 
 For a minimal external handler, see the
-[Spatial Pixel Duplicate reference plugin](https://github.com/deepbeepmeep/wan2gp-pixel-upsampler).
+[Spatial Pixel Duplicate reference Plugin](https://github.com/deepbeepmeep/wan2gp-pixel-upsampler).
 It exposes `pixel*1` through `pixel*4` and supplies the description displayed by
 the Spatial Upsampling information button.
 
-Enabled plugins can expose upsamplers without editing core code by adding
+Enabled Plugins can expose upsamplers without editing core code by adding
 `spatial_upsampler_handlers` to `plugin_info.json`. Entries that start with `.`
-are relative to the plugin package root; entries without a leading `.` are
+are relative to the Plugin package root; entries without a leading `.` are
 absolute import paths:
 
 ```json
@@ -261,7 +261,7 @@ absolute import paths:
 }
 ```
 
-Only enabled/loaded plugins are considered. The plugin manager reuses its cached
+Only enabled/loaded Plugins are considered. The Plugin manager reuses its cached
 `plugin_info.json` metadata when registering those handlers, so the file is not
 parsed a second time for upsampler discovery.
 
@@ -287,7 +287,7 @@ stride-aligned windows (81 frames with a 17-frame overlap by default);
 overlapping windows address the same deterministic global noise and time
 coordinates. Both versions are shown in Post Processing and Late Postprocessing,
 and Media Flow keeps explicit processes for both versions. The Configuration
-plugin exposes only the shared LTX window size and overlap controls under
+Plugin exposes only the shared LTX window size and overlap controls under
 `spatial_upsamplers.ltx2`. Both values follow
 the VAE's `8n+1` frame cadence; window size ranges from 9 to 481 frames, with 81
 as the default. The values are read at the start of every native or Media Flow
@@ -368,9 +368,9 @@ offload_registry.unregister_offloadobj("MyUpsampler", offloadobj)  # in release_
 ```
 
 This lets WanGP track every extension offload object and release all extension
-resources centrally: the toolbar "Unload Models" tool (and the Configuration plugin
+resources centrally: the toolbar "Unload Models" tool (and the Configuration Plugin
 release button) calls `offload_registry.release_all()`.
 
 ---
 
-> Applies to: Developing spatial upsampler/refiner plugins: handlers, registration and shared configuration. Installed processing options are available through WanGP's post-processing controls and API.
+> Applies to: Developing spatial upsampler/refiner Plugins: handlers, registration and shared configuration. Installed processing options are available through WanGP's post-processing controls and API.

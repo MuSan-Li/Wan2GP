@@ -512,7 +512,7 @@ class DeepyPrimeTools:
                         reported = time.monotonic()
                         text = str(live.get("status") or live.get("phase") or "Running")[:120]
                         self._update_tool_progress("running", text, {"status": "running", "job_id": job_id, "progress": {"done": round(float(live["progress"]), 1), "total": 100, "text": text}})
-                    if snapshot.get("webui_submission_ready") and not queue_triggered:
+                    if snapshot.get("webui_submission_ready") and not queue_triggered and not (cancel_requested or job.cancel_requested or self._is_interrupted()):  # a stopped job never reaches the queue
                         self.send_cmd("load_queue_trigger", {"job_id": job_id, "token": snapshot.get("webui_load_queue_token", "")})
                         queue_triggered = True
                         self._update_tool_progress("running", "Running", {"status": "running", "job_id": job_id})
@@ -837,11 +837,15 @@ class DeepyPrimeTools:
         if toolbox and isinstance(inner, dict) and inner.get("action") == arguments.get("action") is not None and set(inner) == {"action", "arguments"} and isinstance(inner["arguments"], dict):
             arguments["arguments"] = inner = inner["arguments"]  # the whole call repeated inside arguments under the same action
         if toolbox and arguments.get("action") is None and isinstance(inner, dict):
-            if set(inner) == {"arguments"} and isinstance(inner["arguments"], dict):
+            if set(arguments) == {"arguments"} and set(inner) & set(properties) - {"action", "arguments"} and set(inner) <= set(properties):
+                arguments.pop("arguments")  # the whole call nested in arguments with its other top-level parameters (wangp_plugins' plugin)
+                arguments.update(inner)
+                inner = arguments.get("arguments")
+            if isinstance(inner, dict) and set(inner) == {"arguments"} and isinstance(inner["arguments"], dict):
                 arguments["arguments"] = inner = inner["arguments"]  # arguments nested twice
-            if isinstance(inner.get("action"), str) and set(inner) <= {"action", "arguments"}:
+            if isinstance(inner, dict) and isinstance(inner.get("action"), str) and set(inner) <= {"action", "arguments"}:
                 arguments.update(action=inner["action"], arguments=inner.get("arguments", {}))  # the whole call nested in arguments: unwrap it
-            elif isinstance(inner.get("action"), str):
+            elif isinstance(inner, dict) and isinstance(inner.get("action"), str):
                 arguments["action"] = inner.pop("action")  # the action written among its own arguments
         unknown = set(arguments) - set(properties)
         if set(properties) == {"action", "arguments"} and isinstance(arguments.get("arguments"), dict) and unknown and not unknown & set(arguments["arguments"]):
@@ -884,6 +888,10 @@ class DeepyPrimeTools:
                 hint = ' For rg, use {"action":"rg","arguments":{"command":"-n pattern -- @documents/file.txt"}}.' if tool_name == "wangp_io" and arguments.get("action") == "rg" else ""
                 return 'arguments must be an object: {"action":"<action>","arguments":{...}}.' + hint
             if not arguments.get("action") and nested:
+                if tool_name == "wangp_plugins":  # name the plugin's call as it should be written, with the caller's own plugin
+                    plugin = json.dumps(arguments.get("plugin") or "<plugin>")
+                    return (f'No action was named. Write the call flat, the action beside plugin and arguments: {{"plugin": {plugin}, "action": "<action>", "arguments": {{...}}}}; '
+                            f'{{"plugin": {plugin}}} alone lists its actions. Nothing was executed.')
                 likely = next((hint for key, hint in (("old_string", "edit"), ("text", "write_text (mode 'overwrite' replaces a file) or append_text"), ("command", "rg")) if key in nested), "")
                 return ('No action was named: write it at the top level, beside arguments: {"action":"<action>","arguments":{...}}' + (f"; with these arguments: {likely}" if likely and tool_name == "wangp_io" else "")
                         + ". Nothing was executed.")

@@ -79,6 +79,7 @@ class modelsManagerPlugin(WAN2GPPlugin):
 
     def create_model_ui(self):
         with gr.Column():
+            gr.HTML('<button type="button" class="wangp-model-manager-link" data-app-route="plugin_configuration">← Back to Configuration</button>')
             gr.Markdown("### Models Manager")
             gr.Markdown(
                 "Sizes are unique GB recoverable on delete, plus shared GB used outside the branch."

@@ -4,7 +4,7 @@
 
 The main goal is to let third-party code call WanGP directly, keep the last loaded model alive across requests, receive structured progress updates, and still capture the same stdout/stderr output that would normally go to the console.
 
-This same API can be used directly from a WanGP PlugIn and uses WanGP Web Queue to process the requested Jobs of called from a Third Party App (for instance https://github.com/deepbeepmeep/LTX-Desktop-WanGP).
+This same API can be used directly from a WanGP Plugin and uses WanGP Web Queue to process the requested Jobs of called from a Third Party App (for instance https://github.com/deepbeepmeep/LTX-Desktop-WanGP).
 
 **Please note that use of the WanGP API is subject to the WanGP Terms and Conditions. Any product that integrates WanGP should clearly disclose that it uses WanGP in both its user interface and its documentation.**
 
@@ -95,12 +95,12 @@ To use existing LoRA collections, add `"--lora-config", "C:/WanGP/lora_paths.jso
 
 - Standalone / CLI-style third-party app or Python script:
   - yes, call `init(...)`
-- WanGP plugin tab receiving an injected `api_session` in `create_config_ui(...)`:
+- WanGP Plugin tab receiving an injected `api_session` in `create_config_ui(...)`:
   - no, do not call `init(...)`
   - use the injected `api_session` directly
 - Low-level in-process integration inside WanGP with direct access to the live Gradio `state`:
   - possible with `init(webui_state=state, ...)`
-  - this is an advanced/internal path, not the normal plugin entrypoint
+  - this is an advanced/internal path, not the normal Plugin entrypoint
 
 ## `init(...)` Parameters
 
@@ -151,12 +151,12 @@ session = init(
   - Optional live WanGP WebUI state dictionary.
   - When provided, submitted tasks target the existing WanGP Gradio queue instead of calling the headless generation path directly.
   - This is mainly a low-level internal / advanced integration hook.
-  - Normal WanGP plugins should use the injected `api_session` instead of calling `init(...)` themselves.
+  - Normal WanGP Plugins should use the injected `api_session` instead of calling `init(...)` themselves.
   - In this mode, `output_dir` is ignored and `on_stream(...)` is not expected because the WebUI queue path is probe-based rather than stdout-capture based.
 
 ### WebUI Queue Mode
 
-This is the WebUI-backed queue mode used by WanGP plugin integrations.
+This is the WebUI-backed queue mode used by WanGP Plugin integrations.
 
 If you are implementing a low-level in-process integration and explicitly need to bind the API to WanGP's live Gradio queue yourself, pass the current `state` dict to `init(...)`:
 
@@ -189,25 +189,25 @@ Differences versus standalone / CLI-style mode:
 
 ### Plugin Tab API Object
 
-For WanGP plugins, a WebUI-backed session can be injected directly into the tab constructor.
+For WanGP Plugins, a WebUI-backed session can be injected directly into the tab constructor.
 
-If a plugin tab constructor accepts one extra positional argument, WanGP now passes a session-shaped API object there:
+If a Plugin tab constructor accepts one extra positional argument, WanGP now passes a session-shaped API object there:
 
 ```python
 def create_config_ui(self, api_session):
     ...
 ```
 
-That object behaves like a normal `WanGPSession`. In a WanGP plugin tab, the WebUI queue integration stays inside the injected session object, so plugin code can keep using the same `submit_task(...)`, `job.result()`, and `job.cancel()` pattern as CLI code.
+That object behaves like a normal `WanGPSession`. In a WanGP Plugin tab, the WebUI queue integration stays inside the injected session object, so Plugin code can keep using the same `submit_task(...)`, `job.result()`, and `job.cancel()` pattern as CLI code.
 
 Plugin-specific difference:
 
-- in a plugin tab, you normally do **not** call `init(...)`
+- in a Plugin tab, you normally do **not** call `init(...)`
 - WanGP creates and injects the WebUI-backed session object for you
-- plugin code should treat `api_session` as the API entrypoint
-- this is the normal WebUI/API path for WanGP plugins
+- Plugin code should treat `api_session` as the API entrypoint
+- this is the normal WebUI/API path for WanGP Plugins
 
-Minimal plugin pattern:
+Minimal Plugin pattern:
 
 ```python
 def create_config_ui(self, api_session):
@@ -237,7 +237,7 @@ def create_config_ui(self, api_session):
             job.cancel()
 ```
 
-In a plugin tab, callback methods like `on_status(...)` and `on_progress(...)` can safely update a local `gr.Progress(...)` while the job itself still runs through WanGP's main WebUI queue.
+In a Plugin tab, callback methods like `on_status(...)` and `on_progress(...)` can safely update a local `gr.Progress(...)` while the job itself still runs through WanGP's main WebUI queue.
 
 ## Model Metadata
 
@@ -323,7 +323,7 @@ At task normalization, WanGP fills missing media-mode flags when the supplied mo
 
 API and MCP tasks may provide `video_length` as a seconds string such as `"10s"`. WanGP uses a numeric `force_fps` when supplied, otherwise the model FPS, and converts the duration to a frame count allowed by the model's frame minimum, step, and offset. Frame counts, given in frames or seconds, are rounded up to the next allowed count, so a video is never shorter than requested: a speech or song driving it keeps its last words.
 
-Useful `SessionJob` handles for plugin authors:
+Useful `SessionJob` handles for Plugin authors:
 
 - `job.result(timeout=None) -> GenerationResult`
   - Waits for completion and returns generated files, errors, and any requested returned media artifacts.
@@ -596,7 +596,7 @@ Explicit MCP v2 retains `wangp_deepy_templates(tool_id="gen_image")`, which retu
 | Media utilities / previous generation settings | `wangp_toolbox` / discovered action or `media_settings` |
 | File navigation, search, text edits, archives | `wangp_io` / `list`, `rg`, `read_text`, `info`, `edit`, `append_text`, `write_text`, etc. |
 | Jobs, notifications, HTTP Gallery transfers | `wangp_session` / `get_job`, `cancel_job`, `list_queue`, `cancel_queue_task`, `notify`, `create_gallery_upload`, `create_gallery_download` (`list_queue` and `cancel_queue_task` are external-only) |
-| Plugin workflows (such as Media Flow batches) | `wangp_plugins` (v2.1, when enabled plugins declare a toolbox) / `plugin`, then a discovered action; `wait=false` runs it as a job |
+| Plugin workflows (such as Media Flow batches) | `wangp_plugins` (v2.1, when enabled Plugins declare a toolbox) / `plugin`, then a discovered action; `wait=false` runs it as a job |
 | Documentation | Standard MCP resources; Prime and external v2.1 expose `mcp_resource` |
 
 Example v2.1 calls:
@@ -638,11 +638,11 @@ IO `rg` adds this pagination around ripgrep; it is not a native rg option. Names
 
 When the folder is named, list it directly, for example `wangp_io(action="list", arguments={"path":"@outputs/selection"})`. Avoid paging through its parent first. For a recursive filename search inside such folders, use `command="--files -g '**/selection/**' -- @outputs"`; `-g '*selection*'` matches basenames, not every descendant of the folder. `-i` changes text matching, not glob casing.
 
-`wangp://guides/workflows` is an index of about 3 KB: one line per workflow section (templates, model limits, media inputs, post-processing and utilities, long video, prompt files and editing) with the URI that reads that section alone, such as `wangp://guides/workflows/long-video-and-sliding-windows`. `mcp_resource` searches and section reads on `wangp://guides/workflows` still cover the whole guide. External v2.1 agents also get a one-line call per action when they list a toolbox's actions, so most calls need no contract read; contracts keep the rules, defaults and examples. Detailed procedural guidance is loaded on demand. Explicit external v1/v2 selection retains its previous filesystem scope. External v2.1 adds the workspace and readable output directories described above; plugin filesystem access remains tied to explicit read permission.
+`wangp://guides/workflows` is an index of about 3 KB: one line per workflow section (templates, model limits, media inputs, post-processing and utilities, long video, prompt files and editing) with the URI that reads that section alone, such as `wangp://guides/workflows/long-video-and-sliding-windows`. `mcp_resource` searches and section reads on `wangp://guides/workflows` still cover the whole guide. External v2.1 agents also get a one-line call per action when they list a toolbox's actions, so most calls need no contract read; contracts keep the rules, defaults and examples. Detailed procedural guidance is loaded on demand. Explicit external v1/v2 selection retains its previous filesystem scope. External v2.1 adds the workspace and readable output directories described above; Plugin filesystem access remains tied to explicit read permission.
 
 In Prime, prefer the session workspace for experiments and editable drafts. Filesystem tools manage that workspace freely. With write access they can create new files in configured output folders and their subfolders, but cannot change, overwrite, delete, rename or move existing output files. Other authorized folders retain their R/RW permissions; deleting or moving an external source removes its vanished-path Gallery entry. This policy does not change generation, post-processing, MCP v1 or Zero contracts.
 
-All product manuals under `docs/` are available as complete MCP resources, including installation, configuration, troubleshooting, model selection, plugins and API integration. Each document ends with a compact `Applies to` note describing its scope for readers. The current server uses that footer as its resource description; Prime and external v2.1 also include it as `applicability` metadata with document reads, section reads and search results, including continuation pages. The scope is therefore available from the first response without reading to the end. Section indexing excludes the footer so its keywords are not attributed to the final section; full-document reads retain it. Interface-specific examples are labelled within mixed documents. This documentation policy does not change filesystem permissions or Deepy Zero's routing.
+All product manuals under `docs/` are available as complete MCP resources, including installation, configuration, troubleshooting, model selection, Plugins and API integration. Each document ends with a compact `Applies to` note describing its scope for readers. The current server uses that footer as its resource description; Prime and external v2.1 also include it as `applicability` metadata with document reads, section reads and search results, including continuation pages. The scope is therefore available from the first response without reading to the end. Section indexing excludes the footer so its keywords are not attributed to the final section; full-document reads retain it. Interface-specific examples are labelled within mixed documents. This documentation policy does not change filesystem permissions or Deepy Zero's routing.
 
 The current workflow resource uses `wangp://guides/workflows`, without a version label in normal discovery or agent instructions. Its previous version-labelled URI is retained as an unlisted read alias. New documents are published automatically and must include an `Applies to` footer describing their subject, audience and relevant platform or interface limits; review tool examples, links and setting semantics before adding them. Product-help documents explain the UI and configuration; current callable contracts govern Deepy's actual tool execution.
 
@@ -947,7 +947,7 @@ Common built-in standalone audio methods:
 
 #### Raw Edit Tasks
 
-All helper calls build normal task settings, so plugins, Deepy, saved queues, manifests, and MCP clients can submit edit tasks directly through `submit_task(...)`, `submit_manifest(...)`, or `wangp_generate(...)`.
+All helper calls build normal task settings, so Plugins, Deepy, saved queues, manifests, and MCP clients can submit edit tasks directly through `submit_task(...)`, `submit_manifest(...)`, or `wangp_generate(...)`.
 
 ```python
 settings = {

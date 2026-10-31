@@ -8,7 +8,7 @@ from dataclasses import dataclass
 import torch
 import torch.nn.functional as F
 from accelerate import init_empty_weights
-from mmgp import offload
+from mmgp import offload, transfer
 from safetensors.torch import load_file
 from tqdm import tqdm
 
@@ -133,7 +133,7 @@ def _color_fixed_frames(decoded: torch.Tensor, sample: torch.Tensor, height: int
         if callable(abort_callback) and abort_callback():
             raise InterruptedError("SeedVR2 upscaling aborted")
         stop = min(start + OUTPUT_FRAME_BATCH_SIZE, decoded.shape[2])
-        content = decoded[0, :, start:stop].to(device).permute(1, 0, 2, 3).float()
+        content = transfer.move(decoded[0, :, start:stop], device).permute(1, 0, 2, 3).float()
         style = _resize_input(sample[:, start:stop], height, width, device)
         count = stop - start
         low_input = torch.empty(count * 2, *content.shape[1:], device=device, dtype=torch.float32)
@@ -142,7 +142,7 @@ def _color_fixed_frames(decoded: torch.Tensor, sample: torch.Tensor, height: int
         style = None
         low_content, low_style = _wavelet_low(low_input).split(count)
         fixed = (content - low_content + low_style).clamp_(-1.0, 1.0).to(decoded.dtype)
-        frames[:, start:stop].copy_(fixed.permute(1, 0, 2, 3).mul_(127.5).add_(127.5).round_().clamp_(0, 255).to(torch.uint8))
+        transfer.copy_(frames[:, start:stop], fixed.permute(1, 0, 2, 3).mul_(127.5).add_(127.5).round_().clamp_(0, 255).to(torch.uint8))
     return frames
 
 

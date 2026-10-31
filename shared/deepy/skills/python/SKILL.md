@@ -22,7 +22,7 @@ description: "Use before the first wangp_python run of a session: how the sandbo
 - `wangp.toolbox(action, **arguments)`: media utilities (resize_crop, extract_video, merge_videos, remux_media, render_3d_views, create_mask, transcribe_media...).
 - `wangp.io(action, {...})`: list, info, read_text, mkdir, copy, move, zip in authorized folders (writing there goes through it: no delete).
 - `wangp.download(url)` / `wangp.web(action, ...)`: the web when web search is enabled (search, images, open, download, screenshot). Pass an address you extracted (an article's `og:image`, a list of file links) straight from its variable: retyping a long url changes it.
-- `wangp.plugins()` / `wangp.plugin(plugin, action, **arguments)`: the toolboxes of enabled plugins (`wangp_plugins`), such as Media Flow's processing of long videos and folders. `wangp.plugins("media_flow")` lists a plugin's actions with their calls; `wangp.plugin` runs one and waits for its result.
+- `wangp.plugins()` / `wangp.plugin(plugin, action, **arguments)`: the toolboxes of enabled Plugins (`wangp_plugins`), such as Media Flow's processing of long videos and folders. `wangp.plugins("media_flow")` lists a Plugin's actions with their calls; `wangp.plugin` runs one and waits for its result.
 - `wangp.call(tool, action, arguments)`: any other callable tool. Not callable from scripts: the web, sessions, Python itself.
 - `wangp.progress(i, total, name)` as each item of a loop starts shows the user a progress bar from the first item, with the item running; `wangp.progress(total, total)` after the loop completes it. `print` lines appear live.
 

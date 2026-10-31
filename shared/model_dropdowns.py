@@ -618,7 +618,8 @@ def create_models_hierarchy(rows):
         if L == 0 and len(prefix_non) > 1:
             L = n
 
-        shares_last = any(mid != pid and mid not in outliers and lt and lt[-1] == p_last for _, mid, _, lt, _ in kids)
+        # a size shared as last word joins the header ("Wan2.1 Text2Video 14B"); a shared word stays in the variants ("INT8 Experts" / "Q4 Experts")
+        shares_last = any(c.isdigit() for c in p_last) and any(mid != pid and mid not in outliers and lt and lt[-1] == p_last for _, mid, _, lt, _ in kids)
         header_tokens_disp = p_tok[:L] + ([p_tok[-1]] if shares_last and L < n else [])
         header = " ".join(header_tokens_disp)
         header_has_last = (L == n) or (shares_last and L < n)

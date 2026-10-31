@@ -2543,9 +2543,19 @@ WAC.applyEvent = function (payload) {
 WAC.syncDisclosureBridge = function () {
   const transcript = WAC.transcript();
   if (!transcript || transcript === WAC.disclosureNode) return;
-  if (WAC.disclosureNode) WAC.disclosureNode.removeEventListener('toggle', WAC.handleDisclosureToggle, true);
+  if (WAC.disclosureNode) {
+    WAC.disclosureNode.removeEventListener('toggle', WAC.handleDisclosureToggle, true);
+  }
   WAC.disclosureNode = transcript;
   WAC.disclosureNode.addEventListener('toggle', WAC.handleDisclosureToggle, true);
+};
+
+WAC.handleThumbnailError = function (event) {
+  const image = event.target;
+  const icon = image.nextElementSibling;
+  if (image.tagName !== 'IMG' || !image.classList.contains('chat__attachment-thumb') || !icon || !icon.hasAttribute('data-attachment-icon')) return;
+  image.hidden = true;  // a preview that could not be made: its typed icon instead of a broken image
+  icon.hidden = false;
 };
 
 WAC.handleScroll = function () {
@@ -2853,6 +2863,7 @@ WAC.installDockBridge = function () {
 };
 
 if (!WAC.init) {
+  document.addEventListener('error', WAC.handleThumbnailError, true);  // load errors do not bubble: caught on the way down, on every page that shows the chat
   WAC.installObserver();
   WAC.installEventBridge();
   WAC.installDockBridge();
