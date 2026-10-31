@@ -118,7 +118,7 @@ class CondaEnvironmentService(EnvironmentService):
         before = self.snapshot(source)
         command = conda_command(source)
         env = clean_environment()
-        env.update(CONDA_REGISTER_ENVS="false", CONDA_ALWAYS_COPY="true", PYTHONDONTWRITEBYTECODE="1")
+        env.update(CONDA_REGISTER_ENVS="false", CONDA_ALWAYS_COPY="true", PYTHONDONTWRITEBYTECODE="1", PYTHONUNBUFFERED="1")
         destination.parent.mkdir(parents=True, exist_ok=True)
         self.runner.events({"type": "progress", "title": "Cloning Conda Environment", "message": "Copying Python and installed packages. The current environment remains unchanged."})
         self.runner.run([*command, "create", "--yes", "--copy", "--clone", str(source), "--prefix", str(destination)], env=env, timeout=None)
@@ -134,7 +134,7 @@ class CondaEnvironmentService(EnvironmentService):
         python = interpreter_path(destination, "conda")
         if self.inventory(destination)["python"] != resolution["python"]:
             env = clean_environment()
-            env.update(CONDA_REGISTER_ENVS="false", CONDA_ALWAYS_COPY="true", PYTHONDONTWRITEBYTECODE="1")
+            env.update(CONDA_REGISTER_ENVS="false", CONDA_ALWAYS_COPY="true", PYTHONDONTWRITEBYTECODE="1", PYTHONUNBUFFERED="1")
             self.runner.events({"type": "progress", "title": "Updating Cloned Python", "message": "Installing Python " + resolution["python"]})
             self.runner.run([*command, "install", "--yes", "--copy", "--prefix", str(destination), "python=" + resolution["python"]], env=env)
         lock = plain_path(resolution_directory) / "pylock.toml"
